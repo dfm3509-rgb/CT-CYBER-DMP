@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">সিটি সাইবার ক্রাইম ইনভেস্টিগেশন - ডিএমপি</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Orbitron:wght@400;700&family=Fira+Code&display=swap');
+        
+        :root {
+            --dmp-blue: #002b5b;
+            --neon-green: #00ff41;
+            --cyber-red: #ff003c;
+            --wa-green: #25D366;
+        }
+
+        body { 
+            font-family: 'Hind Siliguri', sans-serif; 
+            background-color: #010409;
+            color: #e6edf3;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background-image: url('https://images.unsplash.com/photo-1614064641938-3bbee52942c7?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+        }
+
+        .police-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(rgba(1, 4, 9, 0.85), rgba(1, 4, 9, 0.85)), 
+                        url('https://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Dhaka_Metropolitan_Police_Logo.svg/1200px-Dhaka_Metropolitan_Police_Logo.svg.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 30%;
+            opacity: 0.1;
+        }
+
+        .mono { font-family: 'Fira Code', monospace; }
+        .header-font { font-family: 'Orbitron', sans-serif; }
+
+        .glass-panel {
+            background: rgba(1, 4, 9, 0.8);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 255, 65, 0.15);
+        }
+
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 255, 65, 0.05);
+            position: fixed;
+            top: 0;
+            z-index: 100;
+            animation: scan 10s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: -5%; }
+            100% { top: 105%; }
+        }
+
+        .terminal-input {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            color: var(--neon-green);
+        }
+        
+        .terminal-input:focus {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+            outline: none;
+        }
+
+        .dmp-btn {
+            background: linear-gradient(90deg, #002b5b, #004c8c);
+            border-left: 4px solid var(--neon-green);
+            transition: all 0.3s;
+        }
+
+        .dmp-btn:hover {
+            background: var(--neon-green);
+            color: black;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+        }
+
+        .lang-active {
+            background: var(--neon-green);
+            color: black;
+            border-color: var(--neon-green);
+        }
+
+        .qr-placeholder {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .nid-badge {
+            font-size: 9px;
+            background: rgba(0, 255, 65, 0.1);
+            color: var(--neon-green);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 255, 65, 0.3);
+        }
+
+        /* Marquee Animation */
+        .marquee {
+            white-space: nowrap;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        .marquee span {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 30s linear infinite;
+        }
+        @keyframes marquee {
+            0%   { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+    <div class="bg-overlay"></div>
+    <div class="police-bg"></div>
+    <div class="scanline"></div>
+
+    <!-- TOP OPERATIONAL BAR -->
+    <div class="w-full bg-black/90 border-b border-green-500/20 py-1.5 px-6 flex justify-between items-center text-[10px] uppercase font-bold tracking-widest">
+        <div class="flex items-center space-x-4">
+            <span class="text-green-500" data-key="node">নোড: বিডি-ঢাকা-মেইন</span>
+            <span class="text-slate-500">|</span>
+            <span class="text-green-500" data-key="protocol">প্রোটোকল: সুরক্ষিত AES-২৫৬</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center border border-green-500/30 rounded overflow-hidden mr-4">
+                <button onclick="setLanguage('bn')" id="btn-bn" class="px-2 py-0.5 text-[9px] lang-active">বাংলা</button>
+                <button onclick="setLanguage('en')" id="btn-en" class="px-2 py-0.5 text-[9px] border-l border-green-500/30 text-green-500 hover:bg-green-500/10">EN</button>
+            </div>
+            <span class="text-yellow-500"><span data-key="threat">সতর্কতা লেভেল</span>: <span class="animate-pulse" data-key="high">উচ্চ</span></span>
+            <span id="live-timer" class="text-slate-300 mono">00:00:00</span>
+        </div>
+    </div>
+
+    <!-- MAIN NAV -->
+    <header class="glass-panel border-b border-green-500/30 sticky top-0 z-50">
+        <div class="max-w-[1600px] mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center space-x-4 cursor-pointer" onclick="switchTab('public')">
+                <div class="w-12 h-12 border-2 border-green-500 flex items-center justify-center text-green-500 shadow-[0_0_15px_rgba(0,255,65,0.3)]">
+                    <i class="fas fa-shield-alt text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="header-font text-xl font-black tracking-widest text-white leading-none">CT CYBER DMP</h1>
+                    <p class="text-[11px] text-green-500 font-bold uppercase tracking-[0.2em] mt-1" data-key="sub-logo">ঢাকা মেট্রোপলিটন পুলিশ</p>
+                </div>
+            </div>
+            
+            <nav class="flex space-x-3">
+                <button onclick="switchTab('public')" id="nav-public" class="px-6 py-2 border border-green-500 bg-green-500 text-black text-xs font-black uppercase tracking-widest transition-all" data-key="nav-report">
+                    [ অভিযোগ জমা দিন ]
+                </button>
+                <button onclick="switchTab('admin')" id="nav-admin" class="px-6 py-2 border border-green-500 text-green-500 text-xs font-black uppercase tracking-widest hover:bg-green-500/10 transition-all" data-key="nav-admin">
+                    [ অ্যাডমিন প্যানেল ]
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- PUBLIC TAB -->
+    <main id="tab-public" class="max-w-[1400px] mx-auto p-6 md:p-10 animate-fade-in">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- SIDEBAR -->
+            <div class="lg:col-span-3 space-y-6">
+                <div class="glass-panel p-6 border-l-4 border-l-green-500 rounded-lg">
+                    <h3 class="text-xs font-black text-green-500 uppercase mb-4 tracking-widest" data-key="sys-status">সিস্টেম স্ট্যাটাস</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between text-[11px]">
+                            <span class="text-slate-500" data-key="traffic">লাইভ ট্রাফিক</span>
+                            <span class="text-green-500">৮৪০.২ GB/s</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-green-500 h-full w-[92%] animate-pulse"></div>
+                        </div>
+                        <div class="flex justify-between text-[11px]">
+                            <span class="text-slate-500" data-key="total-cases">মোট অভিযোগ</span>
+                            <span id="caseCounter" class="text-white mono">১২,৪০৯</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- National Awareness Section (NEW) -->
+                <div class="glass-panel p-4 rounded-lg overflow-hidden">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Sheikh_Hasina_at_WEF_2017.jpg/640px-Sheikh_Hasina_at_WEF_2017.jpg" alt="PM" class="w-full h-48 object-cover rounded-md mb-4 grayscale hover:grayscale-0 transition-all duration-700">
+                    <p class="text-[10px] font-bold text-green-500 uppercase mb-1 tracking-widest" data-key="vision-title">স্মার্ট বাংলাদেশ লক্ষ্য ২০৪১</p>
+                    <p class="text-[11px] text-slate-300 italic" data-key="vision-quote">"আমরা আমাদের তরুণ প্রজন্মকে আধুনিক প্রযুক্তিতে দক্ষ করে তুলব।" - মাননীয় প্রধানমন্ত্রী শেখ হাসিনা</p>
+                </div>
+
+                <div class="glass-panel p-6 border-l-4 border-l-blue-500 rounded-lg">
+                    <h3 class="text-xs font-black text-blue-500 uppercase mb-4 tracking-widest" data-key="security-log">নিরাপত্তা লগ</h3>
+                    <div id="securityLog" class="text-[10px] space-y-2 font-mono text-slate-400">
+                        <div class="text-blue-400 animate-pulse">[WEB] আইপি ট্র্যাকিং সক্রিয়...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORM -->
+            <div class="lg:col-span-6">
+                <div class="glass-panel p-8 md:p-12 rounded-xl border-green-500/30">
+                    <div class="mb-10">
+                        <h2 class="text-3xl font-black text-white mb-2" data-key="form-title">সাইবার ক্রাইম রিপোর্ট</h2>
+                        <p class="text-green-500 text-xs font-bold uppercase tracking-widest" data-key="form-sub">জাতীয় পরিচয়পত্র অনুযায়ী তথ্য প্রদান করুন</p>
+                    </div>
+                    <form id="complaintForm" class="space-y-6">
+                        <!-- NID INFORMATION GROUP -->
+                        <div class="bg-green-500/5 p-6 rounded-lg border border-green-500/20 space-y-4">
+                            <p class="text-[10px] text-green-500 font-bold uppercase tracking-widest mb-2"><i class="fas fa-id-card mr-2"></i>জাতীয় পরিচয়পত্র যাচাই (NID Verification)</p>
+                            
+                            <div class="space-y-2">
+                                <label class="text-xs text-slate-400 font-bold" data-key="nid-name">পুরো নাম (NID অনুযায়ী)</label>
+                                <input type="text" id="fullname" name="fullname" required placeholder="আব্দুর রহমান" class="w-full terminal-input rounded p-4 text-sm font-bold">
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label class="text-xs text-slate-400 font-bold" data-key="nid-number">NID নম্বর</label>
+                                    <input type="text" id="nid" name="nid" required pattern="[0-9]{10,17}" placeholder="XXXXXXXXXX" class="w-full terminal-input rounded p-4 text-sm font-bold mono">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-xs text-slate-400 font-bold" data-key="dob-label">জন্ম তারিখ (DOB)</label>
+                                    <input type="date" id="dob" name="dob" required class="w-full terminal-input rounded p-4 text-sm font-bold">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-xs text-slate-400 font-bold" data-key="crime-type">অপরাধের ধরন</label>
+                                <select id="category" name="category" required class="w-full terminal-input rounded p-4 text-sm font-bold">
+                                    <option value="" disabled selected data-key="select">নির্বাচন করুন...</option>
+                                    <option value="হ্যাকিং" data-key="cat-hacking">হ্যাকিং / অনধিকার প্রবেশ</option>
+                                    <option value="প্রতারণা" data-key="cat-scam">অনলাইন প্রতারণা / বিকাশ প্রতারণা</option>
+                                    <option value="হ্যারাসমেন্ট" data-key="cat-harassment">সাইবার হ্যারাসমেন্ট / ব্ল্যাকমেইল</option>
+                                    <option value="গুজব" data-key="cat-defamation">সোশ্যাল মিডিয়া অপপ্রচার</option>
+                                </select>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs text-slate-400 font-bold" data-key="mobile-label">মোবাইল নম্বর (বিকাশ/যোগাযোগ)</label>
+                                <input type="tel" id="userMobile" name="userMobile" required placeholder="017XXXXXXXX" class="w-full terminal-input rounded p-4 text-sm font-bold mono">
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-xs text-slate-400 font-bold" data-key="description-label">বিস্তারিত বর্ণনা</label>
+                            <textarea id="description" name="description" required rows="4" data-key-placeholder="placeholder-desc" placeholder="লিঙ্ক, ইউজারনেম বা ট্রানজেকশন আইডি সহ বিস্তারিত লিখুন..." class="w-full terminal-input rounded p-4 text-sm"></textarea>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-xs text-slate-400 font-bold" data-key="upload-label">প্রমাণপত্র আপলোড (স্ক্রিনশট)</label>
+                            <input type="file" id="evidence" name="evidence" accept="image/*" class="w-full terminal-input p-2 text-xs">
+                            <div id="imagePreviewContainer" class="hidden mt-2">
+                                <img id="imagePreview" src="" class="max-h-40 border border-green-500 rounded">
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded text-[10px] text-yellow-500">
+                            <i class="fas fa-exclamation-triangle mr-2"></i> আপনার আইপি অ্যাড্রেস এবং ডিভাইসের তথ্য ফরেনসিক তদন্তের জন্য সংরক্ষণ করা হবে।
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="w-full dmp-btn py-5 text-sm font-black uppercase tracking-[0.3em] text-white rounded-lg" data-key="btn-submit">অভিযোগ দাখিল করুন</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- TRACKING & GOVT NEWS -->
+            <div class="lg:col-span-3 space-y-6">
+                <div class="glass-panel p-6 border-t-4 border-t-yellow-500 rounded-xl">
+                    <h3 class="text-xs font-black text-yellow-500 uppercase mb-6 tracking-widest" data-key="tracking">অভিযোগ ট্র্যাকিং</h3>
+                    <div class="space-y-4">
+                        <input type="text" id="searchId" placeholder="DMP-SYS-0000" class="w-full terminal-input p-4 text-sm font-bold rounded mono">
+                        <button onclick="checkStatus()" class="w-full border border-yellow-500 text-yellow-500 py-4 text-xs font-black uppercase tracking-widest hover:bg-yellow-500 hover:text-black transition-all rounded" data-key="btn-search">সার্চ করুন</button>
+                        <div id="searchResult" class="hidden mt-4 p-4 bg-black/50 border border-green-500/20 rounded text-[11px]"></div>
+                    </div>
+                </div>
+
+                <!-- National News Marquee (NEW) -->
+                <div class="glass-panel p-6 border border-white/5 rounded-xl overflow-hidden">
+                    <h3 class="text-xs font-black text-white uppercase mb-4 tracking-widest flex items-center">
+                        <span class="w-2 h-2 bg-red-500 rounded-full mr-2 animate-ping"></span>
+                        <span data-key="news-title">জাতীয় সংবাদ</span>
+                    </h3>
+                    <div class="marquee bg-black/40 p-2 rounded text-[11px] text-slate-400 font-medium">
+                        <span id="news-content">স্মার্ট বাংলাদেশ বিনির্মাণে সাইবার নিরাপত্তা নিশ্চিত করছে ডিএমপি। সোশ্যাল মিডিয়ায় গুজব ছড়ানো আইনত দণ্ডনীয় অপরাধ। সাইবার অপরাধে সর্বোচ্চ সাজা ১৪ বছর কারাদণ্ড।</span>
+                    </div>
+                </div>
+
+                <!-- Police Activity (NEW) -->
+                <div class="glass-panel p-4 rounded-xl border border-blue-500/20">
+                    <h3 class="text-xs font-black text-blue-500 uppercase mb-4 tracking-widest" data-key="activity-title">ডিএমপি কার্যক্রম</h3>
+                    <div class="space-y-4">
+                        <div class="group cursor-pointer">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Dhaka_Metropolitan_Police_Vehicles.jpg/640px-Dhaka_Metropolitan_Police_Vehicles.jpg" class="w-full h-24 object-cover rounded opacity-60 group-hover:opacity-100 transition-all">
+                            <p class="text-[10px] mt-2 font-bold" data-key="act-1">টহল ও নিরাপত্তা জোরদার</p>
+                        </div>
+                        <div class="group cursor-pointer">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Police_officers_in_Bangladesh_02.jpg/640px-Police_officers_in_Bangladesh_02.jpg" class="w-full h-24 object-cover rounded opacity-60 group-hover:opacity-100 transition-all">
+                            <p class="text-[10px] mt-2 font-bold" data-key="act-2">সাইবার সচেতনতা সেমিনার</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM NATIONAL BANNER (NEW) -->
+        <div class="mt-12 glass-panel p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between border-green-500/20 gap-6">
+            <div class="flex items-center space-x-6">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Government_Seal_of_Bangladesh.svg/1200px-Government_Seal_of_Bangladesh.svg.png" class="w-16 h-16 object-contain grayscale brightness-150">
+                <div>
+                    <h4 class="text-lg font-black text-white uppercase tracking-widest" data-key="banner-title">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</h4>
+                    <p class="text-xs text-slate-500 font-bold" data-key="banner-sub">ডিজিটাল বাংলাদেশ থেকে স্মার্ট বাংলাদেশ অভিমুখে</p>
+                </div>
+            </div>
+            <div class="flex space-x-6 text-center">
+                <div>
+                    <p class="text-2xl font-black text-green-500 mono">৯৯৯</p>
+                    <p class="text-[9px] uppercase font-bold text-slate-500">Emergency</p>
+                </div>
+                <div class="border-l border-white/10 pl-6">
+                    <p class="text-2xl font-black text-blue-500 mono">৩৩৩</p>
+                    <p class="text-[9px] uppercase font-bold text-slate-500">Service Help</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ADMIN TAB -->
+    <main id="tab-admin" class="max-w-[1400px] mx-auto p-6 md:p-10 hidden animate-fade-in">
+        <div id="admin-login" class="max-w-sm mx-auto py-20">
+            <div class="glass-panel p-10 border border-green-500/30 text-center rounded-2xl shadow-2xl">
+                <div class="w-20 h-20 border-4 border-green-500 rounded-full flex items-center justify-center mx-auto mb-8 text-green-500 text-3xl shadow-[0_0_20px_rgba(0,255,65,0.2)]">
+                    <i class="fas fa-fingerprint"></i>
+                </div>
+                <h2 class="header-font text-lg font-black text-white mb-8 tracking-widest uppercase" data-key="admin-access">অ্যাডমিন অ্যাক্সেস</h2>
+                <input type="password" id="adminPass" placeholder="পাসওয়ার্ড দিন" data-key-placeholder="placeholder-pass" class="w-full terminal-input p-4 text-center text-lg mb-6 rounded-lg">
+                <button onclick="handleAdminLogin()" class="w-full bg-green-500 text-black py-4 font-black uppercase tracking-widest text-xs rounded-lg hover:bg-green-400 transition-all" data-key="btn-verify">অনুমতি যাচাই</button>
+            </div>
+        </div>
+
+        <div id="admin-content" class="hidden space-y-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-green-500/30 pb-8 gap-4">
+                <div>
+                    <h2 class="text-3xl font-black text-white uppercase" data-key="admin-title">অপারেশনাল ডেটাবেস</h2>
+                    <p class="text-green-500 text-xs tracking-widest font-bold" data-key="admin-sub">সিটি সাইবার ক্রাইম ইউনিট - রেস্ট্রিক্টেড এরিয়া</p>
+                </div>
+                <div class="flex space-x-4">
+                    <div id="wa-status-box" class="flex items-center space-x-3 bg-black/50 border border-white/10 px-4 py-2 rounded-lg">
+                        <i id="wa-icon" class="fab fa-whatsapp text-xl text-slate-500"></i>
+                        <div class="text-[10px] leading-tight uppercase font-bold">
+                            <div class="text-slate-500" id="wa-status-text" data-key="wa-disconnected">WhatsApp: ডিসকানেক্টেড</div>
+                            <button onclick="openWAModal()" class="text-green-500 hover:underline" id="wa-action-btn" data-key="wa-login-btn">লগইন করুন</button>
+                        </div>
+                    </div>
+                    <button onclick="adminLogout()" class="px-8 py-3 border border-red-500 text-red-500 text-xs font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all rounded" data-key="btn-disconnect">ডিসকানেক্ট</button>
+                </div>
+            </div>
+            
+            <!-- ADMIN COMPLAINTS LIST -->
+            <div id="adminComplaintsList" class="grid grid-cols-1 gap-6"></div>
+        </div>
+    </main>
+
+    <!-- WHATSAPP LOGIN MODAL -->
+    <div id="wa-modal" class="fixed inset-0 bg-black/90 z-[100] hidden items-center justify-center p-6">
+        <div class="glass-panel max-w-md w-full p-8 rounded-2xl text-center relative border-green-500/50">
+            <button onclick="closeWAModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white"><i class="fas fa-times"></i></button>
+            <i class="fab fa-whatsapp text-5xl text-green-500 mb-6"></i>
+            <h3 class="header-font text-white text-lg mb-2" data-key="wa-modal-title">সিস্টেম হোয়াটসঅ্যাপ লিংক</h3>
+            <p class="text-slate-400 text-xs mb-8" data-key="wa-modal-desc">কিউআর কোডটি স্ক্যান করে সিস্টেমের সাথে আপনার হোয়াটসঅ্যাপ যুক্ত করুন</p>
+            <div id="wa-qr-container" class="qr-placeholder mx-auto mb-8 w-48 h-48 flex items-center justify-center">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=DMP-CYBER-WA-BRIDGE-TOKEN-JIB225510" alt="QR Code" class="w-full h-full">
+            </div>
+            <div id="wa-scanning-ui" class="hidden space-y-4">
+                <div class="flex items-center justify-center space-x-2 text-green-500">
+                    <div class="animate-spin h-4 w-4 border-2 border-green-500 border-t-transparent rounded-full"></div>
+                    <span class="text-xs font-bold uppercase tracking-widest" data-key="wa-sync">সিঙ্ক হচ্ছে...</span>
+                </div>
+            </div>
+            <button id="wa-sim-btn" onclick="simulateWAScan()" class="w-full bg-green-500 text-black py-4 font-black uppercase tracking-widest text-xs rounded-lg hover:bg-green-400" data-key="wa-sim-scan">আমি স্ক্যান করেছি</button>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed bottom-10 right-10 translate-x-[200%] transition-all duration-500 z-[100]">
+        <div class="bg-black border border-green-500 px-8 py-5 flex items-center space-x-6 rounded-lg shadow-[0_0_30px_rgba(0,255,65,0.2)]">
+            <div id="toastSpinner" class="hidden animate-spin h-4 w-4 border-2 border-green-500 border-t-transparent rounded-full"></div>
+            <span id="toastMessage" class="text-xs font-bold uppercase tracking-widest text-green-500"></span>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            bn: {
+                "page-title": "সিটি সাইবার ক্রাইম ইনভেস্টিগেশন - ডিএমপি",
+                "node": "নোড: বিডি-ঢাকা-মেইন",
+                "protocol": "প্রোটোকল: সুরক্ষিত AES-২৫৬",
+                "threat": "সতর্কতা লেভেল",
+                "high": "উচ্চ",
+                "sub-logo": "ঢাকা মেট্রোপলিটন পুলিশ",
+                "nav-report": "[ অভিযোগ জমা দিন ]",
+                "nav-admin": "[ অ্যাডমিন প্যানেল ]",
+                "sys-status": "সিস্টেম স্ট্যাটাস",
+                "traffic": "লাইভ ট্রাফিক",
+                "total-cases": "মোট অভিযোগ",
+                "form-title": "সাইবার ক্রাইম রিপোর্ট",
+                "form-sub": "জাতীয় পরিচয়পত্র অনুযায়ী তথ্য প্রদান করুন",
+                "nid-name": "পুরো নাম (NID অনুযায়ী)",
+                "nid-number": "NID নম্বর",
+                "dob-label": "জন্ম তারিখ (DOB)",
+                "crime-type": "অপরাধের ধরন",
+                "select": "নির্বাচন করুন...",
+                "mobile-label": "মোবাইল নম্বর",
+                "cat-hacking": "হ্যাকিং / অনধিকার প্রবেশ",
+                "cat-scam": "অনলাইন প্রতারণা / বিকাশ প্রতারণা",
+                "cat-harassment": "সাইবার হ্যারাসমেন্ট / ব্ল্যাকমেইল",
+                "cat-defamation": "সোশ্যাল মিডিয়া অপপ্রচার",
+                "description-label": "বিস্তারিত বর্ণনা",
+                "placeholder-desc": "লিঙ্ক, ইউজারনেম বা ট্রানজেকশন আইডি সহ বিস্তারিত লিখুন...",
+                "upload-label": "প্রমাণপত্র আপলোড (স্ক্রিনশট)",
+                "btn-submit": "অভিযোগ দাখিল করুন",
+                "tracking": "অভিযোগ ট্র্যাকিং",
+                "btn-search": "সার্চ করুন",
+                "admin-access": "অ্যাডমিন অ্যাক্সেস",
+                "placeholder-pass": "পাসওয়ার্ড দিন",
+                "btn-verify": "অনুমতি যাচাই",
+                "admin-title": "অপারেশনাল ডেটাবেস",
+                "admin-sub": "সিটি সাইবার ক্রাইম ইউনিট - রেস্ট্রিক্টেড এরিয়া",
+                "btn-disconnect": "ডিসকানেক্ট",
+                "wa-disconnected": "WhatsApp: ডিসকানেক্টেড",
+                "wa-connected": "WhatsApp: কানেক্টেড",
+                "wa-login-btn": "লগইন করুন",
+                "wa-logout-btn": "লগআউট করুন",
+                "pending": "পেন্ডিং (যাচাই চলছে)",
+                "signature": "// ডিজিটাল সিগনেচার ভেরিফাইড",
+                "not-found": "রেকর্ড পাওয়া যায়নি",
+                "success-lodge": "সফলভাবে দাখিল হয়েছে",
+                "encrypting": "এনক্রিপ্টিং ও আইপি ট্র্যাকিং...",
+                "vision-title": "স্মার্ট বাংলাদেশ লক্ষ্য ২০৪১",
+                "vision-quote": "\"আমরা আমাদের তরুণ প্রজন্মকে আধুনিক প্রযুক্তিতে দক্ষ করে তুলব।\" - মাননীয় প্রধানমন্ত্রী শেখ হাসিনা",
+                "news-title": "জাতীয় সংবাদ",
+                "news-content": "স্মার্ট বাংলাদেশ বিনির্মাণে সাইবার নিরাপত্তা নিশ্চিত করছে ডিএমপি। সোশ্যাল মিডিয়ায় গুজব ছড়ানো আইনত দণ্ডনীয় অপরাধ। সাইবার অপরাধে সর্বোচ্চ সাজা ১৪ বছর কারাদণ্ড।",
+                "activity-title": "ডিএমপি কার্যক্রম",
+                "act-1": "টহল ও নিরাপত্তা জোরদার",
+                "act-2": "সাইবার সচেতনতা সেমিনার",
+                "banner-title": "গণপ্রজাতন্ত্রী বাংলাদেশ সরকার",
+                "banner-sub": "ডিজিটাল বাংলাদেশ থেকে স্মার্ট বাংলাদেশ অভিমুখে"
+            },
+            en: {
+                "page-title": "CT Cyber Crime Investigation - DMP",
+                "node": "Node: BD-DHK-MAIN",
+                "protocol": "Protocol: Secure AES-256",
+                "threat": "Threat Level",
+                "high": "ELEVATED",
+                "sub-logo": "Dhaka Metropolitan Police",
+                "nav-report": "[ Submit Report ]",
+                "nav-admin": "[ Admin Panel ]",
+                "sys-status": "System Status",
+                "traffic": "Live Traffic",
+                "total-cases": "Total Cases",
+                "form-title": "Cyber Crime Report",
+                "form-sub": "Provide Info as per National ID (NID)",
+                "nid-name": "Full Name (As per NID)",
+                "nid-number": "NID Number",
+                "dob-label": "Date of Birth (DOB)",
+                "crime-type": "Crime Type",
+                "select": "Select Category...",
+                "mobile-label": "Mobile Number",
+                "cat-hacking": "Hacking / Intrusions",
+                "cat-scam": "Online Scams / Mobile Money",
+                "cat-harassment": "Cyber Harassment / Blackmail",
+                "cat-defamation": "Social Media Defamation",
+                "description-label": "Detailed Narrative",
+                "placeholder-desc": "Provide links, usernames, or Transaction IDs...",
+                "upload-label": "Evidence Upload (Screenshot)",
+                "btn-submit": "Lodge Complaint",
+                "tracking": "Case Tracking",
+                "btn-search": "Search System",
+                "admin-access": "Admin Access",
+                "placeholder-pass": "Enter Passkey",
+                "btn-verify": "Verify Identity",
+                "admin-title": "Operational Database",
+                "admin-sub": "CT Cyber Crime Unit - Restricted Area",
+                "btn-disconnect": "Disconnect",
+                "wa-disconnected": "WhatsApp: Disconnected",
+                "wa-connected": "WhatsApp: Connected",
+                "wa-login-btn": "Login Now",
+                "wa-logout-btn": "Logout",
+                "pending": "Pending Verification",
+                "signature": "// Digital Signature Verified",
+                "not-found": "Record Not Found",
+                "success-lodge": "Lodge Successful",
+                "encrypting": "Encrypting & Tracking IP...",
+                "vision-title": "Smart Bangladesh Goal 2041",
+                "vision-quote": "\"We will equip our youth with modern technology skills.\" - Hon. Prime Minister Sheikh Hasina",
+                "news-title": "National News",
+                "news-content": "DMP ensuring cyber security for Smart Bangladesh. Spreading rumors is a punishable offense. Max penalty for cyber crime: 14 years.",
+                "activity-title": "DMP Activity",
+                "act-1": "Increased Patrols & Security",
+                "act-2": "Cyber Awareness Seminar",
+                "banner-title": "Govt of the People's Republic of Bangladesh",
+                "banner-sub": "Transitioning from Digital to Smart Bangladesh"
+            }
+        };
+
+        let currentLang = 'bn';
+        const caseRegistry = [];
+        let globalCounter = 12409;
+        let isWAConnected = false;
+        let clientIP = "103.147.218." + Math.floor(Math.random()*255);
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (translations[lang][key]) el.textContent = translations[lang][key];
+            });
+            document.querySelectorAll('[data-key-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-key-placeholder');
+                if (translations[lang][key]) el.placeholder = translations[lang][key];
+            });
+            document.getElementById('btn-bn').classList.toggle('lang-active', lang === 'bn');
+            document.getElementById('btn-en').classList.toggle('lang-active', lang === 'en');
+            if (!document.getElementById('admin-content').classList.contains('hidden')) renderAdminRegistry();
+            updateWAUI();
+        }
+
+        function generateFIR() {
+            return `DMP-SYS-${Math.floor(Math.random() * 9000) + 1000}`;
+        }
+
+        document.getElementById('complaintForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = currentLang === 'bn' ? "যাচাই হচ্ছে..." : "Verifying...";
+
+            const firNumber = generateFIR();
+            const dossier = {
+                fir: firNumber,
+                timestamp: new Date().toLocaleString(currentLang === 'bn' ? 'bn-BD' : 'en-US'),
+                fullname: this.fullname.value,
+                nid: this.nid.value,
+                dob: this.dob.value,
+                category: this.category.value,
+                mobileNumber: this.userMobile.value,
+                description: this.description.value,
+                imageData: document.getElementById('imagePreview').src,
+                ipAddress: clientIP,
+                userAgent: navigator.userAgent,
+                status: 'pending'
+            };
+
+            caseRegistry.unshift(dossier);
+            globalCounter++;
+            document.getElementById('caseCounter').textContent = currentLang === 'bn' ? globalCounter.toLocaleString('bn-BD') : globalCounter.toLocaleString();
+            
+            showToast(translations[currentLang]["encrypting"], "info", true);
+            
+            setTimeout(() => {
+                showToast(`${translations[currentLang]["success-lodge"]}: ${firNumber}`, "success");
+                btn.disabled = false;
+                btn.textContent = translations[currentLang]["btn-submit"];
+                this.reset();
+                document.getElementById('imagePreviewContainer').classList.add('hidden');
+                document.getElementById('searchId').value = firNumber;
+                renderUserCard(dossier);
+            }, 2000);
+        });
+
+        // WhatsApp Features
+        function openWAModal() {
+            if (isWAConnected) {
+                isWAConnected = false;
+                updateWAUI();
+                showToast(currentLang === 'bn' ? "লগআউট করা হয়েছে" : "Logged Out", "info");
+                return;
+            }
+            document.getElementById('wa-modal').style.display = 'flex';
+        }
+
+        function closeWAModal() {
+            document.getElementById('wa-modal').style.display = 'none';
+        }
+
+        function simulateWAScan() {
+            const btn = document.getElementById('wa-sim-btn');
+            const qr = document.getElementById('wa-qr-container');
+            const sync = document.getElementById('wa-scanning-ui');
+            
+            btn.classList.add('hidden');
+            qr.classList.add('opacity-20');
+            sync.classList.remove('hidden');
+
+            setTimeout(() => {
+                isWAConnected = true;
+                updateWAUI();
+                closeWAModal();
+                showToast(currentLang === 'bn' ? "সিস্টেম লিঙ্কড!" : "System Linked!", "success");
+                btn.classList.remove('hidden');
+                qr.classList.remove('opacity-20');
+                sync.classList.add('hidden');
+                renderAdminRegistry();
+            }, 3000);
+        }
+
+        function updateWAUI() {
+            const statusText = document.getElementById('wa-status-text');
+            const actionBtn = document.getElementById('wa-action-btn');
+            const icon = document.getElementById('wa-icon');
+
+            if (isWAConnected) {
+                statusText.textContent = translations[currentLang]["wa-connected"];
+                statusText.className = "text-green-500";
+                actionBtn.textContent = translations[currentLang]["wa-logout-btn"];
+                actionBtn.className = "text-red-500 hover:underline";
+                icon.className = "fab fa-whatsapp text-xl text-green-500 animate-pulse";
+            } else {
+                statusText.textContent = translations[currentLang]["wa-disconnected"];
+                statusText.className = "text-slate-500";
+                actionBtn.textContent = translations[currentLang]["wa-login-btn"];
+                actionBtn.className = "text-green-500 hover:underline";
+                icon.className = "fab fa-whatsapp text-xl text-slate-500";
+            }
+        }
+
+        function waCall(number) {
+            if (!isWAConnected) {
+                showToast(currentLang === 'bn' ? "প্রথমে হোয়াটসঅ্যাপ লগইন করুন" : "Login to WhatsApp First", "error");
+                openWAModal();
+                return;
+            }
+            if (!number) return;
+            const cleanNumber = number.replace(/\D/g, '');
+            window.open(`https://wa.me/${cleanNumber}`, '_blank');
+        }
+
+        function handleAdminLogin() {
+            if(document.getElementById('adminPass').value === "jib225510") {
+                document.getElementById('admin-login').classList.add('hidden');
+                document.getElementById('admin-content').classList.remove('hidden');
+                renderAdminRegistry();
+            } else {
+                showToast(currentLang === 'bn' ? "অ্যাক্সেস ডিনাইড" : "Access Denied", "error");
+            }
+        }
+
+        function renderAdminRegistry() {
+            const list = document.getElementById('adminComplaintsList');
+            list.innerHTML = '';
+            
+            if(caseRegistry.length === 0) {
+                list.innerHTML = `<div class="col-span-full text-center py-20 text-slate-600 font-bold uppercase tracking-widest border border-dashed border-white/5">${currentLang === 'bn' ? 'কোনো রেকর্ড পাওয়া যায়নি' : 'No Records Found'}</div>`;
+                return;
+            }
+
+            caseRegistry.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "glass-panel p-6 border border-green-500/20 rounded-xl relative overflow-hidden group hover:border-green-500/50 transition-all";
+                card.innerHTML = `
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                        <div class="space-y-4 border-r border-white/5 pr-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="nid-badge">VERIFIED NID DATA</span>
+                                <span class="text-[9px] text-slate-500 mono">${item.timestamp}</span>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-black text-slate-400 uppercase tracking-tighter">Full Name</h4>
+                                <p class="text-white text-sm font-bold">${item.fullname}</p>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-black text-slate-400 uppercase tracking-tighter">NID Number</h4>
+                                <p class="text-green-500 text-sm mono font-bold">${item.nid}</p>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 space-y-4 px-2">
+                             <div class="flex items-center space-x-2">
+                                <span class="bg-red-500 text-black px-2 py-0.5 text-[10px] font-black">${item.category.toUpperCase()}</span>
+                                <span class="text-green-500 text-[10px] font-mono font-bold tracking-widest">${item.fir}</span>
+                            </div>
+                            <div class="bg-black/50 p-4 rounded border border-white/5">
+                                <p class="text-[11px] text-slate-300 leading-relaxed">${item.description}</p>
+                            </div>
+                        </div>
+                        <div class="bg-blue-500/5 p-4 rounded-lg border border-blue-500/20 space-y-3">
+                             <h4 class="text-[10px] text-blue-500 font-black uppercase tracking-widest"><i class="fas fa-microscope mr-2"></i>Forensic Log</h4>
+                             <div class="space-y-2">
+                                <div>
+                                    <label class="text-[9px] text-slate-500 block">IP ADDRESS</label>
+                                    <span class="text-xs text-blue-400 mono font-bold">${item.ipAddress}</span>
+                                </div>
+                                <div class="pt-2">
+                                    <button onclick="waCall('${item.mobileNumber}')" class="w-full py-2 text-[10px] bg-green-500 text-black font-black uppercase rounded">WhatsApp Call</button>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function checkStatus() {
+            const id = document.getElementById('searchId').value.trim();
+            const found = caseRegistry.find(c => c.fir === id);
+            if(found) renderUserCard(found);
+            else showToast(translations[currentLang]["not-found"], "error");
+        }
+
+        function renderUserCard(data) {
+            const res = document.getElementById('searchResult');
+            res.innerHTML = `
+                <div class="text-green-500 space-y-2">
+                    <p class="font-bold">> ID: ${data.fir}</p>
+                    <p>> STATUS: ${translations[currentLang]['pending']}</p>
+                    <p class="text-[9px] text-yellow-500">> IP RECORDED: ${data.ipAddress}</p>
+                </div>
+            `;
+            res.classList.remove('hidden');
+        }
+
+        function showToast(msg, type, spin) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = msg;
+            document.getElementById('toastSpinner').classList.toggle('hidden', !spin);
+            t.classList.remove('translate-x-[200%]');
+            setTimeout(() => t.classList.add('translate-x-[200%]'), 3500);
+        }
+
+        function switchTab(t) {
+            const isPub = t === 'public';
+            document.getElementById('tab-public').classList.toggle('hidden', !isPub);
+            document.getElementById('tab-admin').classList.toggle('hidden', isPub);
+        }
+
+        function adminLogout() {
+            document.getElementById('admin-login').classList.remove('hidden');
+            document.getElementById('admin-content').classList.add('hidden');
+            document.getElementById('adminPass').value = '';
+        }
+
+        document.getElementById('evidence').addEventListener('change', e => {
+            if(e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    document.getElementById('imagePreview').src = ev.target.result;
+                    document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        setInterval(() => {
+            document.getElementById('live-timer').textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
+        }, 1000);
+
+        setLanguage('bn');
+    </script>
+</body>
+</html>
